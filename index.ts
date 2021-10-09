@@ -18,20 +18,33 @@
 
 import fs from 'fs';
 
-// Get Passed in Args
-const rawToRedact = `Hello world “Boston Red Sox”, ‘Pepperoni Pizza’, ‘Cheese Pizza’, beer, "Chris Redfield", 'a big poodle'`;
-const rawText = `
-I went through Mrs Shears’ gate, closing it behind me. Hello! I walked onto her lawn and knelt beside the dog. I put my hand on the muzzle of the dog. It was still warm.
+// Prompt user
+let pathToInput = './input.txt';
+let pathToText = './text.txt';
 
-The dog was called Wellington. It belonged to Mrs Shears who was our friend and my world. Unlike that guy, Chris Redfield, eugh! She lived on the opposite side of the road, two houses to the left.
+// Get Input Keywords and Phrases
+let rawInput = '';
+try {
+  rawInput = fs.readFileSync(pathToInput, 'utf-8');
+  console.log(`Successfully read from ${pathToInput}`);
+} catch(error) {
+  console.log(`Error while reading from ${pathToInput}`, error);
+}
 
-Wellington was a poodle, "Boston Red Sox". Not one of the small poodles that have hairstyles but a big poodle. It had curly black fur, but when you got close you could see that the skin underneath the fur was a very pale yellow, like chicken.
+// Get Text to Redact
+let rawText = '';
+try {
+  rawText = fs.readFileSync(pathToText, 'utf-8');
+  console.log(`Successfully read from ${pathToText}`);
+} catch(error) {
+  console.log(`Error while reading from ${pathToText}`, error);
+}
 
-I stroked Wellington and wondered who had killed him, and why. I really enjoy Pepperoni Pizza and beer! Not cheese pizza though...`;
+///////////////////////////////////////////////////////////////////
 
 // Sanitize rawToRedact of curly quotations
 // Convert all instances of "" to '' for consistency
-const sanitizeRawToRedact = rawToRedact
+const sanitizeRawToRedact = rawInput
   .replace(/[\u2018\u2019]/g, "'")
   .replace(/[\u201C\u201D]/g, "'")
   .replace(/["]/g, "'");
@@ -64,16 +77,25 @@ const keywordsToRedact = remainingKeywordsString
   .split(' ')            // split keywords by individual spaces
   .filter(keyword => keyword !== '') // ensure we omit empty keywords
 
-// Remove phrases first (this avoids accidentally removing keywords that might also be included in phrases, ahead of time)
+///////////////////////////////////////////////////////////////////
+
+const placeholder = 'XXXX';
 let redactedText = rawText;
+
+// Remove phrases first (this avoids accidentally removing keywords that might also be included in phrases, ahead of time)
 for (let phrase of phrasesToRedact) {
-  redactedText = redactedText.split(phrase).join('XXXX');
+  redactedText = redactedText.split(phrase).join(placeholder);
 }
 
 // Redact keywords in text
-fs.writeFileSync('./redacted.txt', redactedText);
+for (let word of keywordsToRedact) {
+  redactedText = redactedText.split(word).join(placeholder);
+}
 
-// Output redacted text into textfile
-console.log(redactedText);
-
-console.log(`Redacted textfile has been outputted to 'redacted.txt'`);
+// Output file to 'redacted.txt'
+try {
+  fs.writeFileSync('./redacted.txt', redactedText);
+  console.log(`Redacted file has been outputted to 'redacted.txt'`);
+} catch(error) {
+  console.log(`Error outputting 'redacted.txt'`, error);
+}
