@@ -1,9 +1,10 @@
 /**
- * THE PROCESS
+ * Planning the final process
  *
  * 1) Sanitize Input
- *   - ensure quotes are in the proper format (e.g. curly single-double quotes converted to regular, SINGLE quotes)
- *   - ensure greater string is wrapped with DOUBLE quotes
+ *   - ensure quotes are in the proper format
+ *   - account for curly quotations (single and double)
+ *   - utilize single quotes as the standard for identifying phrases
  * 2) Extract phrases from input
  *   - extract phrase (surrounded by single quotes)
  *   - add phrase to list of 'redactables'
